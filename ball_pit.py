@@ -28,3 +28,6 @@ class BallPit:
         if self.pit_type == "small":
             return True
         return False
+
+    def is_large(self):
+        return not self.is_small()
