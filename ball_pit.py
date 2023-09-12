@@ -4,6 +4,11 @@ class BallPit:
         self.associated_player = player
         self.pit_type = pit_type
 
+    def __str__(self):
+        if self.is_large():
+            return f"Large pit with {self.get_ball_count()} balls"
+        return f"Small pit with {self.get_ball_count()} balls"
+
     def get_ball_count(self):
         return self.ball_count
 
