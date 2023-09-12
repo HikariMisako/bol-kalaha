@@ -2,9 +2,14 @@ from ball_pit import BallPit
 import random
 
 
-def create_player_pits(number_playing_pits: int, associated_player_is_first: bool, starting_balls: int):
+def create_player_pits(
+    number_playing_pits: int, associated_player_is_first: bool, starting_balls: int
+):
     # we need to create the regular pits for each player, plus a scoring pit for each
-    pit_list = [BallPit(associated_player_is_first, pit_type="small") for _i in range(number_playing_pits)]
+    pit_list = [
+        BallPit(associated_player_is_first, pit_type="small")
+        for _i in range(number_playing_pits)
+    ]
     for pit in pit_list:
         pit.add_ball(ball_count=starting_balls)
     pit_list.append(BallPit(associated_player_is_first, pit_type="large"))
@@ -17,24 +22,28 @@ class KalahaGame:
     number_of_pits = 0
 
     def __init__(self, number_of_pits: int, starting_balls: int):
-        self.pit_list.extend(create_player_pits(
-            number_playing_pits=number_of_pits,
-            associated_player_is_first=True,
-            starting_balls=starting_balls
-        ))
-        self.pit_list.extend(create_player_pits(
-            number_playing_pits=number_of_pits,
-            associated_player_is_first=False,
-            starting_balls=starting_balls
-        ))
+        self.pit_list.extend(
+            create_player_pits(
+                number_playing_pits=number_of_pits,
+                associated_player_is_first=True,
+                starting_balls=starting_balls,
+            )
+        )
+        self.pit_list.extend(
+            create_player_pits(
+                number_playing_pits=number_of_pits,
+                associated_player_is_first=False,
+                starting_balls=starting_balls,
+            )
+        )
         self.number_of_pits = number_of_pits
 
     def get_player_pits(self, player_is_first: bool):
         return [pit for pit in self.pit_list if pit.match_player(player_is_first)]
 
-    def get_scoring_pit(self, player_is_first: bool):
+    def get_scoring_pit(self, player: bool):
         # there is only one scoring pit per player, so filtering is easy
-        return [pit for pit in self.get_player_pits(player_is_first) if pit.is_large()][0]
+        return [pit for pit in self.get_player_pits(player) if pit.is_large()][0]
 
     def get_regular_pits(self, player_is_first: bool):
         return [pit for pit in self.get_player_pits(player_is_first) if pit.is_small()]
@@ -46,7 +55,9 @@ class KalahaGame:
         :return: number of balls that is playable
         """
         regular_player_pits = self.get_regular_pits(player)
-        playable_balls_count = sum([pit.get_ball_count() for pit in regular_player_pits])
+        playable_balls_count = sum(
+            [pit.get_ball_count() for pit in regular_player_pits]
+        )
         return playable_balls_count
 
     def get_player_score(self, player_is_first: bool):
@@ -63,7 +74,10 @@ class KalahaGame:
         If either of the players has no more balls to play, the game is over
         :return: return True if the game is over.
         """
-        if self.get_player_balls_remaining(True) == 0 or self.get_player_balls_remaining(False) == 0:
+        if (
+            self.get_player_balls_remaining(True) == 0
+            or self.get_player_balls_remaining(False) == 0
+        ):
             self.current_player_is_first = None
             self.print_scores()
             print("Game over!")
@@ -96,13 +110,24 @@ class KalahaGame:
                 return len(self.pit_list) - 1
 
     def print_scores(self):
-        print("\t".join([f"P{i}:{self.pit_list[i].get_ball_count()}" for i in range(len(self.pit_list))]))
+        print(
+            "\t".join(
+                [
+                    f"P{i}:{self.pit_list[i].get_ball_count()}"
+                    for i in range(len(self.pit_list))
+                ]
+            )
+        )
 
         player_a_pits = self.get_player_pits(player_is_first=True)
         player_b_pits = self.get_player_pits(player_is_first=False)
 
-        player_b_printline = "\t".join([str(pit.get_ball_count()) for pit in player_b_pits][::-1])
-        player_a_printline = "\t" + "\t".join([str(pit.get_ball_count()) for pit in player_a_pits])
+        player_b_printline = "\t".join(
+            [str(pit.get_ball_count()) for pit in player_b_pits][::-1]
+        )
+        player_a_printline = "\t" + "\t".join(
+            [str(pit.get_ball_count()) for pit in player_a_pits]
+        )
         print(player_b_printline)
         print(player_a_printline)
 
@@ -128,7 +153,9 @@ class KalahaGame:
                 current_pit_index = 0
 
             current_pit = self.pit_list[current_pit_index]
-            if (current_pit.is_large() and current_pit.match_player(player)) or current_pit.is_small():
+            if (
+                current_pit.is_large() and current_pit.match_player(player)
+            ) or current_pit.is_small():
                 current_pit.add_ball()
                 number_of_balls_played -= 1
         return current_pit_index
@@ -148,7 +175,9 @@ class KalahaGame:
                 if ended_pit.get_ball_count() == 1:
                     opposite_pit = self.get_opposite_pit(ended_pit_index)
                     scored_balls = opposite_pit.empty_pit() + ended_pit.empty_pit()
-                    self.get_scoring_pit(self.get_current_player()).add_ball(ball_count=scored_balls)
+                    self.get_scoring_pit(self.get_current_player()).add_ball(
+                        ball_count=scored_balls
+                    )
                 self.switch_player()
             # no need for the else case where the ending pit is large, just don't switch the player
         else:
@@ -156,7 +185,7 @@ class KalahaGame:
 
     def play_pit(self, pit_index: int):
         """
-        Play the pit at the given index
+        Play the pit at the index given
         :param pit_index: index of the pit to play
         :return: None
         """
@@ -174,7 +203,7 @@ class KalahaGame:
         self.check_endgame()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     game = KalahaGame(number_of_pits=6, starting_balls=6)
     for number in [2, 7, 3, 9, 0, 7, 1, 12, 5, 12, 9, 3, 5, 2, 10]:
         print(number)
