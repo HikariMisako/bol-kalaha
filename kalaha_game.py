@@ -38,17 +38,17 @@ class KalahaGame:
         )
         self.number_of_pits = number_of_pits
 
-    def get_player_pits(self, player_is_first: bool):
+    def get_player_pits(self, player_is_first: bool) -> list[BallPit]:
         return [pit for pit in self.pit_list if pit.match_player(player_is_first)]
 
-    def get_scoring_pit(self, player: bool):
+    def get_scoring_pit(self, player: bool) -> BallPit:
         # there is only one scoring pit per player, so filtering is easy
         return [pit for pit in self.get_player_pits(player) if pit.is_large()][0]
 
-    def get_regular_pits(self, player_is_first: bool):
+    def get_regular_pits(self, player_is_first: bool) -> list[BallPit]:
         return [pit for pit in self.get_player_pits(player_is_first) if pit.is_small()]
 
-    def get_player_balls_remaining(self, player: bool):
+    def get_player_balls_remaining(self, player: bool) -> int:
         """
         Count the number of balls the player can play
         :param player: what player to check
@@ -60,16 +60,16 @@ class KalahaGame:
         )
         return playable_balls_count
 
-    def get_player_score(self, player_is_first: bool):
+    def get_player_score(self, player_is_first: bool) -> int:
         return self.get_scoring_pit(player_is_first).get_ball_count()
 
-    def switch_player(self):
+    def switch_player(self) -> None:
         self.current_player_is_first = not self.current_player_is_first
 
-    def get_current_player(self):
+    def get_current_player(self) -> bool:
         return self.current_player_is_first
 
-    def check_endgame(self):
+    def check_endgame(self) -> bool:
         """
         If either of the players has no more balls to play, the game is over
         :return: return True if the game is over.
@@ -90,7 +90,7 @@ class KalahaGame:
             return True
         return False
 
-    def get_opposite_pit(self, pit_index: int):
+    def get_opposite_pit(self, pit_index: int) -> BallPit:
         """
         Used for the case when a player ends up in his own pit that was empty before
         We don't need to grab the opposite scoring pit, but it's a nice bonus
@@ -107,9 +107,9 @@ class KalahaGame:
             if pit_index == len(self.pit_list) - 1:
                 return self.get_scoring_pit(True)
             else:
-                return len(self.pit_list) - 1
+                return self.pit_list[len(self.pit_list) - 1]
 
-    def print_scores(self):
+    def print_scores(self) -> None:
         print(
             "\t".join(
                 [
@@ -136,7 +136,7 @@ class KalahaGame:
         else:
             print("Current Player: SECOND PLAYER")
 
-    def distribute_balls_from_pit(self, player: bool, start_index: int):
+    def distribute_balls_from_pit(self, player: bool, start_index: int) -> int:
         """
         Take the balls from one pit, and distribute them through the following pits
         :param player: Player who plays this pit, used to determine which pits to put a ball in
@@ -160,7 +160,7 @@ class KalahaGame:
                 number_of_balls_played -= 1
         return current_pit_index
 
-    def determine_turn_end(self, ended_pit_index):
+    def determine_turn_end(self, ended_pit_index) -> None:
         """
         Perform the turn end logic:
         if it's their big pit they get another turn
@@ -183,7 +183,7 @@ class KalahaGame:
         else:
             self.switch_player()
 
-    def play_pit(self, pit_index: int):
+    def play_pit(self, pit_index: int) -> None:
         """
         Play the pit at the index given
         :param pit_index: index of the pit to play

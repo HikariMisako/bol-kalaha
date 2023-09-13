@@ -17,13 +17,13 @@ class BallPit:
             return f"Large pit with {self.get_ball_count()} balls, associated player {self.associated_player}"
         return f"Small pit with {self.get_ball_count()} balls, associated player {self.associated_player}"
 
-    def get_ball_count(self):
+    def get_ball_count(self) -> int:
         """
         :return: current number of balls in this ball pit
         """
         return self.ball_count
 
-    def add_ball(self, ball_count: int = 1):
+    def add_ball(self, ball_count: int = 1) -> int:
         """
         Add one or more balls to the ball pit.
         :param ball_count: number of balls to add.
@@ -34,7 +34,7 @@ class BallPit:
         self.ball_count += ball_count
         return self.ball_count
 
-    def empty_pit(self):
+    def empty_pit(self) -> int:
         """
         Removes all the balls in the pit, if the pit is small.
         :return: The number of balls that were in the pit before emptying.
@@ -46,7 +46,7 @@ class BallPit:
         else:
             raise TypeError("Cannot empty big pit during play")
 
-    def match_player(self, player: bool):
+    def match_player(self, player: bool) -> bool:
         """
         Checks if the input player is the player associated with this ball pit.
         :param player: player to check against the associated player
@@ -56,7 +56,7 @@ class BallPit:
             return True
         return False
 
-    def is_small(self):
+    def is_small(self) -> bool:
         """
         Checks whether this pit is a small pit or not.
         :return: True if small, False otherwise
@@ -65,14 +65,14 @@ class BallPit:
             return True
         return False
 
-    def is_large(self):
+    def is_large(self) -> bool:
         """
         Checks whether this pit is a large pit or not.
         :return: True if large, False otherwise
         """
         return not self.is_small()
 
-    def is_playable(self, player: bool):
+    def is_playable(self, player: bool) -> bool:
         """
         Checks whether the given player can play balls from this pit.
         :return:
