@@ -21,6 +21,7 @@ class KalahaGame:
     pit_list = []
     current_player_is_first = True
     number_of_pits = 0
+    game_is_done = False
 
     def __init__(self, number_of_pits: int, starting_balls: int):
         self.pit_list = create_player_pits(
@@ -86,6 +87,7 @@ class KalahaGame:
                 print("Player two wins!")
             else:
                 print("Nobody won!?")
+            self.game_is_done = True
             return True
         return False
 
@@ -135,10 +137,9 @@ class KalahaGame:
         else:
             print("Current Player: SECOND PLAYER")
 
-    def distribute_balls_from_pit(self, player: bool, start_index: int) -> int:
+    def _distribute_balls_from_pit(self, start_index: int) -> int:
         """
         Take the balls from one pit, and distribute them through the following pits
-        :param player: Player who plays this pit, used to determine which pits to put a ball in
         :param start_index: Index of selected starting pit
         :return: index of the pit where the last ball ended up in
         """
@@ -153,13 +154,13 @@ class KalahaGame:
 
             current_pit = self.pit_list[current_pit_index]
             if (
-                current_pit.is_large() and current_pit.match_player(player)
+                current_pit.is_large() and current_pit.match_player(self.get_current_player())
             ) or current_pit.is_small():
                 current_pit.add_ball()
                 number_of_balls_played -= 1
         return current_pit_index
 
-    def determine_turn_end(self, ended_pit_index) -> None:
+    def _determine_turn_end(self, ended_pit_index) -> None:
         """
         Perform the turn end logic:
         if it's their big pit they get another turn
@@ -188,16 +189,17 @@ class KalahaGame:
         :param pit_index: index of the pit to play
         :return: None
         """
+        if self.game_is_done:
+            raise ValueError("Game is over, no more moves can be done!")
         current_player = self.get_current_player()
         played_pit = self.pit_list[pit_index]
         try:
             played_pit.is_playable(current_player)
-            ended_pit_index = self.distribute_balls_from_pit(current_player, pit_index)
+            ended_pit_index = self._distribute_balls_from_pit(pit_index)
         except ValueError as val_err:
             print(f"This pit cannot be played because {val_err}")
             raise val_err
-        # remember this can go round and round!
-        self.determine_turn_end(ended_pit_index)
+        self._determine_turn_end(ended_pit_index)
         self.check_endgame()
 
 
