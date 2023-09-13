@@ -23,12 +23,10 @@ class KalahaGame:
     number_of_pits = 0
 
     def __init__(self, number_of_pits: int, starting_balls: int):
-        self.pit_list.extend(
-            create_player_pits(
-                number_playing_pits=number_of_pits,
-                associated_player_is_first=True,
-                starting_balls=starting_balls,
-            )
+        self.pit_list = create_player_pits(
+            number_playing_pits=number_of_pits,
+            associated_player_is_first=True,
+            starting_balls=starting_balls,
         )
         self.pit_list.extend(
             create_player_pits(
@@ -146,7 +144,7 @@ class KalahaGame:
         """
         played_pit = self.pit_list[start_index]
         current_pit_index = start_index
-        number_of_balls_played = played_pit.empty_pit(player)
+        number_of_balls_played = played_pit.empty_pit()
         while number_of_balls_played > 0:
             current_pit_index += 1
             # check if we've gone round a loop
@@ -200,7 +198,6 @@ class KalahaGame:
             raise val_err
         # remember this can go round and round!
         self.determine_turn_end(ended_pit_index)
-        self.print_scores()
         self.check_endgame()
 
 
@@ -209,6 +206,7 @@ if __name__ == "__main__":
     for number in [2, 7, 3, 9, 0, 7, 1, 12, 5, 12, 9, 3, 5, 2, 10]:
         print(number)
         game.play_pit(number)
+        game.print_scores()
     while game.get_current_player() is not None:
         try_pit = random.randint(0, 13)
         try:
