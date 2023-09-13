@@ -1,5 +1,6 @@
-from ball_pit import BallPit
 import random
+
+from ball_pit import BallPit
 
 
 def create_player_pits(
@@ -145,7 +146,7 @@ class KalahaGame:
         """
         played_pit = self.pit_list[start_index]
         current_pit_index = start_index
-        number_of_balls_played = played_pit.empty_pit()
+        number_of_balls_played = played_pit.empty_pit(player)
         while number_of_balls_played > 0:
             current_pit_index += 1
             # check if we've gone round a loop

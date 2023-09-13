@@ -39,12 +39,14 @@ class BallPit:
         Removes all the balls in the pit, if the pit is small.
         :return: The number of balls that were in the pit before emptying.
         """
+        # note that is_playable would be the wrong check,
+        # one player can empty the opposite player's pit if they land on an empty pit of their own
         if self.is_small():
             current_balls = self.ball_count
             self.ball_count = 0
             return current_balls
         else:
-            raise TypeError("Cannot empty big pit during play")
+            raise ValueError("Cannot empty big pit during play")
 
     def match_player(self, player: bool) -> bool:
         """
@@ -81,4 +83,6 @@ class BallPit:
             raise ValueError("this pit does not belong to this player!")
         if self.get_ball_count() <= 0:
             raise ValueError("this pit is empty!")
+        if self.is_large():
+            raise ValueError("the scoring pit cannot be played!")
         return True
