@@ -17,6 +17,16 @@ class BallPit:
             return f"Large pit with {self.get_ball_count()} balls, associated player {self.associated_player}"
         return f"Small pit with {self.get_ball_count()} balls, associated player {self.associated_player}"
 
+    def short_str(self) -> str:
+        return_str = ""
+        if self.is_large():
+            return_str += "L"
+        player = "1"
+        if not self.associated_player:
+            player = "2"
+        return_str += f"P{player}-{self.get_ball_count()}"
+        return return_str
+
     def get_ball_count(self) -> int:
         """
         :return: current number of balls in this ball pit

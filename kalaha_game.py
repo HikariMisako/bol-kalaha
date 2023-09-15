@@ -110,15 +110,15 @@ class KalahaGame:
             else:
                 return self.pit_list[len(self.pit_list) - 1]
 
-    def print_scores(self) -> None:
-        print(
+    def get_score_text(self) -> list[str]:
+        print_lines = [(
             "\t".join(
                 [
-                    f"P{i}:{self.pit_list[i].get_ball_count()}"
+                    f"{i}:{self.pit_list[i].short_str()}"
                     for i in range(len(self.pit_list))
                 ]
             )
-        )
+        )]
 
         player_a_pits = self.get_player_pits(player_is_first=True)
         player_b_pits = self.get_player_pits(player_is_first=False)
@@ -129,13 +129,18 @@ class KalahaGame:
         player_a_printline = "\t" + "\t".join(
             [str(pit.get_ball_count()) for pit in player_a_pits]
         )
-        print(player_b_printline)
-        print(player_a_printline)
+        print_lines.append(player_b_printline)
+        print_lines.append(player_a_printline)
 
         if self.current_player_is_first:
-            print("Current player: FIRST PLAYER")
+            print_lines.append("Current player: FIRST PLAYER")
         else:
-            print("Current Player: SECOND PLAYER")
+            print_lines.append("Current Player: SECOND PLAYER")
+        return print_lines
+
+    def print_scores(self) -> None:
+        for line in self.get_score_text():
+            print(line)
 
     def _distribute_balls_from_pit(self, start_index: int) -> int:
         """
@@ -154,7 +159,8 @@ class KalahaGame:
 
             current_pit = self.pit_list[current_pit_index]
             if (
-                current_pit.is_large() and current_pit.match_player(self.get_current_player())
+                current_pit.is_large()
+                and current_pit.match_player(self.get_current_player())
             ) or current_pit.is_small():
                 current_pit.add_ball()
                 number_of_balls_played -= 1
@@ -189,6 +195,8 @@ class KalahaGame:
         :param pit_index: index of the pit to play
         :return: None
         """
+        if pit_index < 0:
+            raise ValueError("Positive pit indices only!")
         if self.game_is_done:
             raise ValueError("Game is over, no more moves can be done!")
         current_player = self.get_current_player()
