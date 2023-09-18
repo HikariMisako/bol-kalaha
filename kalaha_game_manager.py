@@ -9,12 +9,9 @@ class KalahaManager:
             number_of_pits=number_of_pits, starting_balls=starting_balls
         )
 
-    def play_pit(self, pit_index: int):
-        try:
-            self.game.play_pit(pit_index)
-        except ValueError as val_exc:
-            return str(val_exc)
+    def play_pit(self, pit_index: int) -> dict:
+        self.game.play_pit(pit_index)
         return self.get_scores()
 
-    def get_scores(self):
-        return self.game.get_score_text()
+    def get_scores(self) -> dict:
+        return self.game.get_score_dict()

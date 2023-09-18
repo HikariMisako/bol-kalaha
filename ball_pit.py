@@ -1,21 +1,15 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class BallPit:
     """
     Ball pit to hold 'balls' in. No ball objects are created, they are only counted.
+    Since the class is relatively simple, a dataclass saves writing some code for __init__ and __str__
     """
-
-    def __init__(self, player: bool, pit_type: str):
-        self.ball_count = 0
-        self.associated_player = player
-        self.pit_type = pit_type
-
-    def __str__(self):
-        """
-        Quick-read print formatting
-        :return: string with large/small pit info, current ball count and associated player
-        """
-        if self.is_large():
-            return f"Large pit with {self.get_ball_count()} balls, associated player {self.associated_player}"
-        return f"Small pit with {self.get_ball_count()} balls, associated player {self.associated_player}"
+    associated_player: bool
+    pit_type: str
+    ball_count: int = 0
 
     def short_str(self) -> str:
         return_str = ""
@@ -28,17 +22,9 @@ class BallPit:
         return return_str
 
     def get_ball_count(self) -> int:
-        """
-        :return: current number of balls in this ball pit
-        """
         return self.ball_count
 
     def add_ball(self, ball_count: int = 1) -> int:
-        """
-        Add one or more balls to the ball pit.
-        :param ball_count: number of balls to add.
-        :return: resulting number of balls in the pit.
-        """
         if ball_count < 1:
             raise ValueError("ball_count needs to be an integer above zero!")
         self.ball_count += ball_count
@@ -69,25 +55,17 @@ class BallPit:
         return False
 
     def is_small(self) -> bool:
-        """
-        Checks whether this pit is a small pit or not.
-        :return: True if small, False otherwise
-        """
         if self.pit_type == "small":
             return True
         return False
 
     def is_large(self) -> bool:
-        """
-        Checks whether this pit is a large pit or not.
-        :return: True if large, False otherwise
-        """
         return not self.is_small()
 
     def is_playable(self, player: bool) -> bool:
         """
         Checks whether the given player can play balls from this pit.
-        :return:
+        :return: True if the player can play, otherwise raises an error specifying _why_
         """
         if not self.match_player(player):
             raise ValueError("this pit does not belong to this player!")

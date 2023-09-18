@@ -6,13 +6,11 @@ from ball_pit import BallPit
 def create_player_pits(
     number_playing_pits: int, associated_player_is_first: bool, starting_balls: int
 ):
-    # we need to create the regular pits for each player, plus a scoring pit for each
+    # we need to create regular pits for each player, plus a scoring pit for each
     pit_list = [
-        BallPit(associated_player_is_first, pit_type="small")
+        BallPit(associated_player_is_first, pit_type="small", ball_count=starting_balls)
         for _i in range(number_playing_pits)
     ]
-    for pit in pit_list:
-        pit.add_ball(ball_count=starting_balls)
     pit_list.append(BallPit(associated_player_is_first, pit_type="large"))
     return pit_list
 
@@ -69,7 +67,7 @@ class KalahaGame:
     def get_current_player(self) -> bool:
         return self.current_player_is_first
 
-    def check_endgame(self) -> bool:
+    def check_endgame(self) -> [bool, str]:
         """
         If either of the players has no more balls to play, the game is over
         :return: return True if the game is over.
@@ -79,22 +77,19 @@ class KalahaGame:
             or self.get_player_balls_remaining(False) == 0
         ):
             self.current_player_is_first = None
-            self.print_scores()
-            print("Game over!")
-            if self.get_player_score(True) > self.get_player_score(False):
-                print("Player one wins!")
-            elif self.get_player_score(True) < self.get_player_score(False):
-                print("Player two wins!")
-            else:
-                print("Nobody won!?")
             self.game_is_done = True
-            return True
+            if self.get_player_score(True) > self.get_player_score(False):
+                return "Player one wins!"
+            elif self.get_player_score(True) < self.get_player_score(False):
+                return "Player two wins!"
+            else:
+                return "DRAW!?"
         return False
 
     def get_opposite_pit(self, pit_index: int) -> BallPit:
         """
         Used for the case when a player ends up in his own pit that was empty before
-        We don't need to grab the opposite scoring pit, but it's a nice bonus
+        We don't need to grab the opposite scoring pit, but it's a nice bonus if we can
         :param pit_index:
         :return: the pit 'opposite' to the index given as input.
         """
@@ -110,37 +105,40 @@ class KalahaGame:
             else:
                 return self.pit_list[len(self.pit_list) - 1]
 
-    def get_score_text(self) -> list[str]:
-        print_lines = [(
-            "\t".join(
+    def get_score_dict(self) -> dict:
+        """
+        :return: Returns a dictionary containing a human-readable game state with:
+        - Current number of balls for each pit
+        - A line for each player in the kalaha "board" format
+        - Whose turn it is
+        """
+        return_dict = {
+            # the pit index is useful for play, so we add both the index and the short string to the output
+            "pits": "  ".join(
                 [
                     f"{i}:{self.pit_list[i].short_str()}"
                     for i in range(len(self.pit_list))
                 ]
             )
-        )]
+        }
 
         player_a_pits = self.get_player_pits(player_is_first=True)
         player_b_pits = self.get_player_pits(player_is_first=False)
 
-        player_b_printline = "\t".join(
+        player_b_line = "  ".join(
             [str(pit.get_ball_count()) for pit in player_b_pits][::-1]
         )
-        player_a_printline = "\t" + "\t".join(
+        player_a_line = "   " + "  ".join(
             [str(pit.get_ball_count()) for pit in player_a_pits]
         )
-        print_lines.append(player_b_printline)
-        print_lines.append(player_a_printline)
+        return_dict["player_2"] = player_b_line
+        return_dict["player_1"] = player_a_line
 
         if self.current_player_is_first:
-            print_lines.append("Current player: FIRST PLAYER")
+            return_dict["turn"] = "Current player: FIRST PLAYER"
         else:
-            print_lines.append("Current Player: SECOND PLAYER")
-        return print_lines
-
-    def print_scores(self) -> None:
-        for line in self.get_score_text():
-            print(line)
+            return_dict["turn"] = "Current player: SECOND PLAYER"
+        return return_dict
 
     def _distribute_balls_from_pit(self, start_index: int) -> int:
         """
@@ -198,28 +196,10 @@ class KalahaGame:
         if pit_index < 0:
             raise ValueError("Positive pit indices only!")
         if self.game_is_done:
-            raise ValueError("Game is over, no more moves can be done!")
+            raise ValueError("Game is over, no more moves can be made!")
         current_player = self.get_current_player()
         played_pit = self.pit_list[pit_index]
-        try:
-            played_pit.is_playable(current_player)
-            ended_pit_index = self._distribute_balls_from_pit(pit_index)
-        except ValueError as val_err:
-            print(f"This pit cannot be played because {val_err}")
-            raise val_err
+        played_pit.is_playable(current_player)
+        ended_pit_index = self._distribute_balls_from_pit(pit_index)
         self._determine_turn_end(ended_pit_index)
         self.check_endgame()
-
-
-if __name__ == "__main__":
-    game = KalahaGame(number_of_pits=6, starting_balls=6)
-    for number in [2, 7, 3, 9, 0, 7, 1, 12, 5, 12, 9, 3, 5, 2, 10]:
-        print(number)
-        game.play_pit(number)
-        game.print_scores()
-    while game.get_current_player() is not None:
-        try_pit = random.randint(0, 13)
-        try:
-            game.play_pit(try_pit)
-        except:
-            pass
