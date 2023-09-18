@@ -1,6 +1,7 @@
 import random
 
 from kalaha_game import KalahaGame
+from kalaha_helper import create_score_overview
 from pytest import fixture, raises
 
 number_of_pits = 6
@@ -94,16 +95,31 @@ def test_get_player_score(clean_game, halfway_game, finished_game):
 
 def test_switch_player(clean_game):
     assert clean_game.get_current_player()
-    clean_game.switch_player()
+    clean_game._switch_player()
     assert not clean_game.get_current_player()
-    clean_game.switch_player()
+    clean_game._switch_player()
     assert clean_game.get_current_player()
 
 
 def test_check_endgame(clean_game, halfway_game, finished_game):
     assert not clean_game.check_endgame()
+    clean_score_overview = create_score_overview(
+        clean_game.get_current_player(), clean_game.pit_list, clean_game.game_is_done
+    )
+    assert "game_outcome" not in clean_score_overview
+
+    halfway_score_overview = create_score_overview(
+        halfway_game.get_current_player(), halfway_game.pit_list, halfway_game.game_is_done
+    )
+    assert "game_outcome" not in halfway_score_overview
     assert not halfway_game.check_endgame()
     assert finished_game.check_endgame()
+    assert isinstance(finished_game.check_endgame(), str)
+
+    finished_score_overview = create_score_overview(
+        finished_game.get_current_player(), finished_game.pit_list, finished_game.game_is_done
+    )
+    assert "game_outcome" in finished_score_overview
 
 
 def test_get_opposite_pit():

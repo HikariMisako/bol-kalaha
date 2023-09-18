@@ -4,9 +4,13 @@ from kalaha_game import KalahaGame
 class KalahaManager:
     game = KalahaGame(number_of_pits=6, starting_balls=6)
 
-    def new_game(self, number_of_pits: int, starting_balls: int):
+    def new_game(
+        self, number_of_pits: int, starting_balls: int, default_game_mode: bool
+    ):
         self.game = KalahaGame(
-            number_of_pits=number_of_pits, starting_balls=starting_balls
+            number_of_pits=number_of_pits,
+            starting_balls=starting_balls,
+            default_game_mode=default_game_mode,
         )
 
     def play_pit(self, pit_index: int) -> dict:

@@ -1,40 +1,29 @@
-import random
-
 from ball_pit import BallPit
-
-
-def create_player_pits(
-    number_playing_pits: int, associated_player_is_first: bool, starting_balls: int
-):
-    # we need to create regular pits for each player, plus a scoring pit for each
-    pit_list = [
-        BallPit(associated_player_is_first, pit_type="small", ball_count=starting_balls)
-        for _i in range(number_playing_pits)
-    ]
-    pit_list.append(BallPit(associated_player_is_first, pit_type="large"))
-    return pit_list
+from kalaha_helper import create_player_pits, create_score_overview
 
 
 class KalahaGame:
-    pit_list = []
-    current_player_is_first = True
-    number_of_pits = 0
-    game_is_done = False
+    pit_list: list = []
+    current_player_is_first: [bool, str] = True
+    game_is_done: [bool, str] = False
+    # some articles state that _any_ time a player lands on his own pit he gets another turn
+    # while not a specific requirement, it's common enough to implement
+    # in the default mode this does not happen
+    default_game_mode: bool
 
-    def __init__(self, number_of_pits: int, starting_balls: int):
-        self.pit_list = create_player_pits(
+    def __init__(self, number_of_pits: int, starting_balls: int, default_game_mode: bool = False):
+        player_a_pits = create_player_pits(
             number_playing_pits=number_of_pits,
             associated_player_is_first=True,
             starting_balls=starting_balls,
         )
-        self.pit_list.extend(
-            create_player_pits(
-                number_playing_pits=number_of_pits,
-                associated_player_is_first=False,
-                starting_balls=starting_balls,
-            )
+        player_b_pits = create_player_pits(
+            number_playing_pits=number_of_pits,
+            associated_player_is_first=False,
+            starting_balls=starting_balls,
         )
-        self.number_of_pits = number_of_pits
+        self.pit_list = player_a_pits + player_b_pits
+        self.default_game_mode = default_game_mode
 
     def get_player_pits(self, player_is_first: bool) -> list[BallPit]:
         return [pit for pit in self.pit_list if pit.match_player(player_is_first)]
@@ -61,7 +50,14 @@ class KalahaGame:
     def get_player_score(self, player_is_first: bool) -> int:
         return self.get_scoring_pit(player_is_first).get_ball_count()
 
-    def switch_player(self) -> None:
+    def get_score_dict(self) -> dict:
+        return create_score_overview(
+            current_player=self.current_player_is_first,
+            all_pits=self.pit_list,
+            game_is_done=self.game_is_done,
+        )
+
+    def _switch_player(self) -> None:
         self.current_player_is_first = not self.current_player_is_first
 
     def get_current_player(self) -> bool:
@@ -70,21 +66,21 @@ class KalahaGame:
     def check_endgame(self) -> [bool, str]:
         """
         If either of the players has no more balls to play, the game is over
-        :return: return True if the game is over.
+        :return: return the winner as a string if the game is over.
         """
         if (
-            self.get_player_balls_remaining(True) == 0
-            or self.get_player_balls_remaining(False) == 0
+            self.get_player_balls_remaining(player=True) == 0
+            or self.get_player_balls_remaining(player=False) == 0
         ):
             self.current_player_is_first = None
-            self.game_is_done = True
-            if self.get_player_score(True) > self.get_player_score(False):
-                return "Player one wins!"
-            elif self.get_player_score(True) < self.get_player_score(False):
-                return "Player two wins!"
+            if self.get_player_score(player_is_first=True) > self.get_player_score(player_is_first=False):
+                self.game_is_done = "Player one wins!"
+            elif self.get_player_score(player_is_first=True) < self.get_player_score(player_is_first=False):
+                self.game_is_done = "Player two wins!"
             else:
-                return "DRAW!?"
-        return False
+                # According to wikipedia, a draw is possible
+                self.game_is_done = "DRAW!?, NOBODY WINS?"
+        return self.game_is_done
 
     def get_opposite_pit(self, pit_index: int) -> BallPit:
         """
@@ -104,41 +100,6 @@ class KalahaGame:
                 return self.get_scoring_pit(True)
             else:
                 return self.pit_list[len(self.pit_list) - 1]
-
-    def get_score_dict(self) -> dict:
-        """
-        :return: Returns a dictionary containing a human-readable game state with:
-        - Current number of balls for each pit
-        - A line for each player in the kalaha "board" format
-        - Whose turn it is
-        """
-        return_dict = {
-            # the pit index is useful for play, so we add both the index and the short string to the output
-            "pits": "  ".join(
-                [
-                    f"{i}:{self.pit_list[i].short_str()}"
-                    for i in range(len(self.pit_list))
-                ]
-            )
-        }
-
-        player_a_pits = self.get_player_pits(player_is_first=True)
-        player_b_pits = self.get_player_pits(player_is_first=False)
-
-        player_b_line = "  ".join(
-            [str(pit.get_ball_count()) for pit in player_b_pits][::-1]
-        )
-        player_a_line = "   " + "  ".join(
-            [str(pit.get_ball_count()) for pit in player_a_pits]
-        )
-        return_dict["player_2"] = player_b_line
-        return_dict["player_1"] = player_a_line
-
-        if self.current_player_is_first:
-            return_dict["turn"] = "Current player: FIRST PLAYER"
-        else:
-            return_dict["turn"] = "Current player: SECOND PLAYER"
-        return return_dict
 
     def _distribute_balls_from_pit(self, start_index: int) -> int:
         """
@@ -176,16 +137,20 @@ class KalahaGame:
         ended_pit = self.pit_list[ended_pit_index]
         if ended_pit.match_player(self.get_current_player()):
             if ended_pit.is_small():
+                # when the alternative game mode is active,
+                # the player _always_ gets another turn when landing on their own pit
+                # in the default, only when the pit was empty before landing on it
                 if ended_pit.get_ball_count() == 1:
                     opposite_pit = self.get_opposite_pit(ended_pit_index)
                     scored_balls = opposite_pit.empty_pit() + ended_pit.empty_pit()
                     self.get_scoring_pit(self.get_current_player()).add_ball(
                         ball_count=scored_balls
                     )
-                self.switch_player()
+                if self.default_game_mode:
+                    self._switch_player()
             # no need for the else case where the ending pit is large, just don't switch the player
         else:
-            self.switch_player()
+            self._switch_player()
 
     def play_pit(self, pit_index: int) -> None:
         """
@@ -203,3 +168,15 @@ class KalahaGame:
         ended_pit_index = self._distribute_balls_from_pit(pit_index)
         self._determine_turn_end(ended_pit_index)
         self.check_endgame()
+
+
+if __name__ == '__main__':
+    import random
+    finished_game = KalahaGame(number_of_pits=6, starting_balls=6,default_game_mode=False)
+    while finished_game.get_current_player() is not None:
+        try_pit = random.randint(0, 6 * 2 + 1)
+        try:
+            finished_game.play_pit(try_pit)
+            print(finished_game.get_score_dict())
+        except ValueError as _exc:
+            pass
