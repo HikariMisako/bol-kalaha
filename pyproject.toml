@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "bol-kalaha"
+version = "0.0.1"
+description = "Implementation of the \"kalaha\" game"
+authors = ["Jeroen v Hoek <jvanhoek@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.103.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
