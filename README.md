@@ -8,9 +8,10 @@ Run the following commands:
 
 `poetry install`
 
-## Running
+If you face issues when using poetry install, any python 3.9 or above environment with `fastapi` 0.103.0 or above should
+be able to run this project.
 
-# TODO
+## Running the code
 
 In order to launch the 'app' run the following in terminal:
 
