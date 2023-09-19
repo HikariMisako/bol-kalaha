@@ -1,5 +1,4 @@
-from kalaha_game import KalahaGame
-
+from bol_kalaha.kalaha_game import KalahaGame
 
 class KalahaManager:
     game = KalahaGame(number_of_pits=6, starting_balls=6)

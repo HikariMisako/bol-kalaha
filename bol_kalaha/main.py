@@ -1,14 +1,21 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
+from api_model import Scores
 from kalaha_game_manager import KalahaManager
 
 app = FastAPI()
 manager = KalahaManager()
 
 
+@app.get("/", include_in_schema=False)
+def redirect_to_docs():
+    return RedirectResponse("/internal/docs")
+
+
 @app.get("/get_scores")
-def get_scores():
-    return manager.get_scores()
+def get_scores() -> Scores:
+    return Scores.model_validate(manager.get_scores())
 
 
 @app.put("/new_game")

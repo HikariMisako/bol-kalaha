@@ -1,5 +1,5 @@
-from ball_pit import BallPit
-from kalaha_helper import create_player_pits, create_score_overview
+from bol_kalaha.ball_pit import BallPit
+from bol_kalaha.kalaha_helper import create_player_pits, create_score_overview
 
 
 class KalahaGame:

@@ -1,4 +1,4 @@
-from ball_pit import BallPit
+from bol_kalaha.ball_pit import BallPit
 
 
 def create_player_pits(
@@ -6,10 +6,10 @@ def create_player_pits(
 ) -> list[BallPit]:
     # we need to create regular pits for each player, plus a scoring pit for each
     pit_list = [
-        BallPit(associated_player_is_first, pit_type="small", ball_count=starting_balls)
+        BallPit(associated_player=associated_player_is_first, pit_type="small", ball_count=starting_balls)
         for _i in range(number_playing_pits)
     ]
-    pit_list.append(BallPit(associated_player_is_first, pit_type="large"))
+    pit_list.append(BallPit(associated_player=associated_player_is_first, pit_type="large"))
     return pit_list
 
 
@@ -54,9 +54,7 @@ def create_score_overview(
                 f"{i:02}:     {p1_pit.get_ball_count()}      {p2_pit.get_ball_count()}      :{mirror_i:02}"
             )
 
-    return_dict = {}
-    for i in range(len(lines)):
-        return_dict[f"{i:02}"] = lines[i]
+    return_dict = {"lines": lines}
 
     if current_player:
         return_dict["turn"] = "Current player: FIRST PLAYER"

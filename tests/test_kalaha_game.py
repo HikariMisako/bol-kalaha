@@ -1,7 +1,7 @@
 import random
 
-from kalaha_game import KalahaGame
-from kalaha_helper import create_score_overview
+from bol_kalaha.kalaha_game import KalahaGame
+from bol_kalaha.kalaha_helper import create_score_overview
 from pytest import fixture, raises
 
 number_of_pits = 6

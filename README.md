@@ -3,8 +3,7 @@
 ## Installation
 
 Run the following commands:
-
-`pip install poetry`
+Following requirements, install poetry  #todo install page of poetry
 
 `poetry install`
 
@@ -15,7 +14,7 @@ be able to run this project.
 
 In order to launch the 'app' run the following in terminal:
 
-`uvicorn main:app`
+`uvicorn bol_kalaha.main:app`
 
 Note: add `--reload` during development for quicker edits
 
