@@ -5,14 +5,14 @@
 Install poetry according to the instructions:
 https://python-poetry.org/docs/
 
-Then run the command:
+Then, using some form of terminal inside the folder root folder (bol-kalaha) run the command:
 `poetry install`
 
 ## Running the code
 
-In order to launch the 'app' run the following in terminal:
+In order to launch the 'app' run the following in terminal inside the root folder (bol-kalaha):
 
-`uvicorn src.main:app`
+`poetry run uvicorn src.main:app`
 
 Note: add `--reload` during development for quicker edits
 
@@ -28,4 +28,4 @@ another turn if you end on your own large pit or on your own small pit that was 
 /get_all_pits returns all the current pits in a list, useful in the future
 
 ## Running the unit tests
-`python -m pytest tests/`
+`poetry run python -m pytest tests/`
