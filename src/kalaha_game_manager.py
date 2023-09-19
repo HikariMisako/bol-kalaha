@@ -1,15 +1,15 @@
-from bol_kalaha.kalaha_game import KalahaGame
+from src.kalaha_enums import GameType
+from src.kalaha_game import KalahaGame
+
 
 class KalahaManager:
     game = KalahaGame(number_of_pits=6, starting_balls=6)
 
-    def new_game(
-        self, number_of_pits: int, starting_balls: int, default_game_mode: bool
-    ):
+    def new_game(self, number_of_pits: int, starting_balls: int, game_type: GameType):
         self.game = KalahaGame(
             number_of_pits=number_of_pits,
             starting_balls=starting_balls,
-            default_game_mode=default_game_mode,
+            game_type=game_type,
         )
 
     def play_pit(self, pit_index: int) -> dict:

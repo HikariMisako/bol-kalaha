@@ -1,0 +1,2 @@
+class NotPlayableError(ValueError):
+    pass

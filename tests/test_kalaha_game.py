@@ -1,7 +1,9 @@
 import random
 
-from bol_kalaha.kalaha_game import KalahaGame
-from bol_kalaha.kalaha_helper import create_score_overview
+from src.kalaha_enums import Player
+from src.kalaha_errors import NotPlayableError
+from src.kalaha_game import KalahaGame
+from src.kalaha_helper import create_score_overview
 from pytest import fixture, raises
 
 number_of_pits = 6
@@ -40,78 +42,69 @@ def finished_game():
 
 
 def test_get_player_pits(clean_game, halfway_game):
-    clean_pits_a = clean_game.get_player_pits(True)
+    clean_pits_a = clean_game.get_player_pits(Player.PLAYER_1)
     for pit in clean_pits_a:
-        assert pit.match_player(True)
-    used_pits_a = halfway_game.get_player_pits(True)
+        assert pit.match_player(Player.PLAYER_1)
+    used_pits_a = halfway_game.get_player_pits(Player.PLAYER_1)
     for pit in used_pits_a:
-        assert pit.match_player(True)
+        assert pit.match_player(Player.PLAYER_1)
 
 
 def test_get_scoring_pit(clean_game, halfway_game, finished_game):
-    clean_scoring_pit_a = clean_game.get_scoring_pit(True)
+    clean_scoring_pit_a = clean_game.get_scoring_pit(Player.PLAYER_1)
     assert clean_scoring_pit_a.get_ball_count() == 0
-    assert clean_scoring_pit_a.match_player(True)
+    assert clean_scoring_pit_a.match_player(Player.PLAYER_1)
     with raises(ValueError):
-        clean_scoring_pit_a.is_playable(True)
-    halfway_scoring_pit_a = halfway_game.get_scoring_pit(True)
+        clean_scoring_pit_a.is_playable(Player.PLAYER_1)
+    halfway_scoring_pit_a = halfway_game.get_scoring_pit(Player.PLAYER_1)
     assert halfway_scoring_pit_a.get_ball_count() > 0
-    assert halfway_scoring_pit_a.match_player(True)
+    assert halfway_scoring_pit_a.match_player(Player.PLAYER_1)
     with raises(ValueError):
-        halfway_scoring_pit_a.is_playable(True)
-    finished_scoring_pit_a = finished_game.get_scoring_pit(True)
+        halfway_scoring_pit_a.is_playable(Player.PLAYER_1)
+    finished_scoring_pit_a = finished_game.get_scoring_pit(Player.PLAYER_1)
     assert finished_scoring_pit_a.get_ball_count() > 0
-    assert finished_scoring_pit_a.match_player(True)
+    assert finished_scoring_pit_a.match_player(Player.PLAYER_1)
     with raises(ValueError):
-        finished_scoring_pit_a.is_playable(True)
+        finished_scoring_pit_a.is_playable(Player.PLAYER_1)
 
 
 def test_get_regular_pits(clean_game):
-    assert len(clean_game.get_regular_pits(True)) == number_of_pits
-    assert len(clean_game.get_regular_pits(False)) == number_of_pits
-    for pit in clean_game.get_regular_pits(True):
+    assert len(clean_game.get_regular_pits(Player.PLAYER_1)) == number_of_pits
+    assert len(clean_game.get_regular_pits(Player.PLAYER_2)) == number_of_pits
+    for pit in clean_game.get_regular_pits(Player.PLAYER_1):
         assert pit.get_ball_count() == starting_balls
         assert pit.is_small()
 
 
 def test_get_player_balls_remaining(clean_game, halfway_game, finished_game):
     assert (
-        clean_game.get_player_balls_remaining(True) == number_of_pits * starting_balls
+        clean_game.get_player_balls_remaining(Player.PLAYER_1) == number_of_pits * starting_balls
     )
     assert (
-        halfway_game.get_player_balls_remaining(True) < number_of_pits * starting_balls
+        halfway_game.get_player_balls_remaining(Player.PLAYER_1) < number_of_pits * starting_balls
     )
     assert finished_game.get_player_balls_remaining(
-        True
-    ) < halfway_game.get_player_balls_remaining(True)
+        Player.PLAYER_1
+    ) < halfway_game.get_player_balls_remaining(Player.PLAYER_1)
 
 
 def test_get_player_score(clean_game, halfway_game, finished_game):
     # finished game is randomized, so making tests too specific might have random failures
-    assert clean_game.get_player_score(True) == 0
-    assert clean_game.get_player_score(False) == 0
-    assert finished_game.get_player_score(True) > halfway_game.get_player_score(True)
+    assert clean_game.get_player_score(Player.PLAYER_1) == 0
+    assert clean_game.get_player_score(Player.PLAYER_2) == 0
+    assert finished_game.get_player_score(Player.PLAYER_1) > halfway_game.get_player_score(Player.PLAYER_1)
 
 
 def test_switch_player(clean_game):
-    assert clean_game.get_current_player()
+    assert clean_game.get_current_player() == Player.PLAYER_1
     clean_game._switch_player()
-    assert not clean_game.get_current_player()
+    assert clean_game.get_current_player() == Player.PLAYER_2
     clean_game._switch_player()
-    assert clean_game.get_current_player()
+    assert clean_game.get_current_player() == Player.PLAYER_1
 
 
 def test_check_endgame(clean_game, halfway_game, finished_game):
     assert not clean_game.check_endgame()
-    clean_score_overview = create_score_overview(
-        clean_game.get_current_player(), clean_game.pit_list, clean_game.game_is_done
-    )
-    assert "game_outcome" not in clean_score_overview
-
-    halfway_score_overview = create_score_overview(
-        halfway_game.get_current_player(), halfway_game.pit_list, halfway_game.game_is_done
-    )
-    assert "game_outcome" not in halfway_score_overview
     assert not halfway_game.check_endgame()
     assert finished_game.check_endgame()
     assert isinstance(finished_game.check_endgame(), str)
@@ -149,7 +142,8 @@ def test_play_pit(halfway_game, finished_game):
     assert halfway_game.pit_list[1].get_ball_count() == 4
     assert halfway_game.pit_list[2].get_ball_count() == 2
     assert halfway_game.pit_list[3].get_ball_count() == 3
-    assert not halfway_game.get_current_player()
+    print(halfway_game.get_current_player())
+    assert halfway_game.get_current_player() == Player.PLAYER_2
 
-    with raises(ValueError):
+    with raises(NotPlayableError):
         finished_game.play_pit(0)

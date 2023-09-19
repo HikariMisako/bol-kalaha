@@ -14,7 +14,7 @@ be able to run this project.
 
 In order to launch the 'app' run the following in terminal:
 
-`uvicorn bol_kalaha.main:app`
+`uvicorn src.main:app`
 
 Note: add `--reload` during development for quicker edits
 

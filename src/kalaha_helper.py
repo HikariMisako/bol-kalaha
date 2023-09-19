@@ -1,20 +1,27 @@
-from bol_kalaha.ball_pit import BallPit
+from src.ball_pit import BallPit
+from src.kalaha_enums import PitType, Player
 
 
 def create_player_pits(
-    number_playing_pits: int, associated_player_is_first: bool, starting_balls: int
+    number_playing_pits: int, associated_player: Player, starting_balls: int
 ) -> list[BallPit]:
     # we need to create regular pits for each player, plus a scoring pit for each
     pit_list = [
-        BallPit(associated_player=associated_player_is_first, pit_type="small", ball_count=starting_balls)
+        BallPit(
+            associated_player=associated_player,
+            pit_type=PitType.SMALL,
+            ball_count=starting_balls,
+        )
         for _i in range(number_playing_pits)
     ]
-    pit_list.append(BallPit(associated_player=associated_player_is_first, pit_type="large"))
+    pit_list.append(
+        BallPit(associated_player=associated_player, pit_type=PitType.LARGE)
+    )
     return pit_list
 
 
 def create_score_overview(
-    current_player: bool, all_pits: list[BallPit], game_is_done: [bool, str]
+    current_player: Player, all_pits: list[BallPit], game_is_done: [bool, str]
 ) -> dict:
     """
     :return: Returns a dictionary containing a human-readable game state with:
@@ -54,13 +61,13 @@ def create_score_overview(
                 f"{i:02}:     {p1_pit.get_ball_count()}      {p2_pit.get_ball_count()}      :{mirror_i:02}"
             )
 
-    return_dict = {"lines": lines}
-
-    if current_player:
-        return_dict["turn"] = "Current player: FIRST PLAYER"
-    else:
-        return_dict["turn"] = "Current player: SECOND PLAYER"
+    return_dict = {
+        "scores_list": lines,
+        "player_turn": f"Current player: {current_player}",
+    }
 
     if game_is_done:
         return_dict["game_outcome"] = game_is_done
+    else:
+        return_dict["game_outcome"] = "Game is ongoing!"
     return return_dict

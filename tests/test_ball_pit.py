@@ -1,4 +1,4 @@
-from bol_kalaha.ball_pit import BallPit
+from src.ball_pit import BallPit
 from pytest import fixture, raises
 
 
