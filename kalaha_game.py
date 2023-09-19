@@ -11,7 +11,7 @@ class KalahaGame:
     # in the default mode this does not happen
     default_game_mode: bool
 
-    def __init__(self, number_of_pits: int, starting_balls: int, default_game_mode: bool = False):
+    def __init__(self, number_of_pits: int, starting_balls: int, default_game_mode: bool = True):
         player_a_pits = create_player_pits(
             number_playing_pits=number_of_pits,
             associated_player_is_first=True,
