@@ -1,5 +1,5 @@
-
 from typing import Any
+
 from src.ball_pit import BallPit
 from src.kalaha_enums import GameType, Player
 from src.kalaha_errors import NotPlayableError
@@ -16,8 +16,13 @@ class KalahaGame:
     # https://en.wikipedia.org/wiki/Kalah?oldformat=true#Standard_gameplay point #5
     game_type: GameType
 
-    def __init__(self, number_of_pits: int, starting_balls: int, game_type: GameType = GameType.BOL_DEFAULT,
-                 **data: Any):
+    def __init__(
+        self,
+        number_of_pits: int,
+        starting_balls: int,
+        game_type: GameType = GameType.BOL_DEFAULT,
+        **data: Any
+    ):
         super().__init__(**data)
         player_a_pits = create_player_pits(
             number_playing_pits=number_of_pits,
