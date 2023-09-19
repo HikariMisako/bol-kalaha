@@ -1,3 +1,5 @@
+
+from typing import Any
 from src.ball_pit import BallPit
 from src.kalaha_enums import GameType, Player
 from src.kalaha_errors import NotPlayableError
@@ -11,14 +13,12 @@ class KalahaGame:
     # some articles state that _any_ time a player lands on his own pit he gets another turn
     # while not a specific requirement, it's common enough to implement
     # in the default mode this does not happen
+    # https://en.wikipedia.org/wiki/Kalah?oldformat=true#Standard_gameplay point #5
     game_type: GameType
 
-    def __init__(
-        self,
-        number_of_pits: int,
-        starting_balls: int,
-        game_type: GameType = GameType.BOL_DEFAULT,
-    ):
+    def __init__(self, number_of_pits: int, starting_balls: int, game_type: GameType = GameType.BOL_DEFAULT,
+                 **data: Any):
+        super().__init__(**data)
         player_a_pits = create_player_pits(
             number_playing_pits=number_of_pits,
             associated_player=Player.PLAYER_1,
@@ -182,6 +182,9 @@ class KalahaGame:
         ended_pit_index = self._distribute_balls_from_pit(pit_index)
         self._determine_turn_end(ended_pit_index)
         self.check_endgame()
+
+    def get_all_pits_dict(self):
+        return {"pit_list": self.pit_list}
 
 
 if __name__ == "__main__":

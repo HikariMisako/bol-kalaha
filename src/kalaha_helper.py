@@ -39,6 +39,7 @@ def create_score_overview(
     "04": "02:     0      <LARGE",
     """
     # this format is far from ideal, however once a proper display format is decided this can be reworked
+    # ideally, this function is discarded and the manager function get_all_pits is used for the user interface
     lines = ["I:      P1     P2     :I"]
 
     # for each pit in the list, we want to display the index and the current number of balls.

@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class GameType(Enum):
+class GameType(str, Enum):
     BOL_DEFAULT = "bol_default"
     WIKIPEDIA_VERSION = "wikipedia_version"
 
@@ -14,6 +14,6 @@ class Player(Enum):
         return self.name
 
 
-class PitType(Enum):
-    SMALL = 1
-    LARGE = 2
+class PitType(str, Enum):
+    SMALL = "small"
+    LARGE = "large"

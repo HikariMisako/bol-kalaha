@@ -9,7 +9,6 @@ class BallPit(BaseModel):
     Ball pit to hold 'balls' in. No ball objects are created, they are only counted.
     Since the class is relatively simple, a dataclass saves writing some code for __init__ and __str__
     """
-
     associated_player: Player
     pit_type: PitType
     ball_count: int = 0
